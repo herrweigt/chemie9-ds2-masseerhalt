@@ -1,0 +1,793 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Chemie 9 · Doppelstunde 2 · Periodensystem und Masseerhalt</title>
+<style>
+:root{--bg:#f3f6fb;--card:#fff;--ink:#1b2a3a;--muted:#5b6b7c;--line:#d8e0ea;--accent:#0b6bcb;--accent-d:#084f96;--warn:#c2410c;--ok:#15803d;--bad:#b91c1c;--navy:#12304f}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{font-family:"Segoe UI",system-ui,-apple-system,Roboto,Arial,sans-serif;background:var(--bg);color:var(--ink);line-height:1.45;font-size:17px}
+header{background:var(--navy);color:#fff;padding:10px 20px;display:flex;gap:14px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+header h1{margin:0;font-size:1.25rem}
+header p{margin:2px 0 0;font-size:.85rem;opacity:.85}
+button,select,input,textarea{font:inherit}
+button{border:1px solid var(--line);background:#fff;border-radius:10px;padding:9px 14px;cursor:pointer;min-height:42px}
+button:hover:not(:disabled){border-color:var(--accent)}
+button:disabled{opacity:.45;cursor:not-allowed}
+button.primary{background:var(--accent);color:#fff;border-color:var(--accent-d);font-weight:600}
+button.primary:hover:not(:disabled){background:var(--accent-d)}
+header button{background:transparent;color:#fff;border-color:#5d7fa3}
+#nav{position:sticky;top:0;z-index:20;background:#fff;border-bottom:1px solid var(--line);padding:8px 14px;display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+#nav button{padding:5px 10px;min-height:36px;font-size:.92rem}
+#nav button.cur{background:var(--navy);color:#fff;border-color:var(--navy)}
+#nav button.done{border-color:var(--ok);color:var(--ok)}
+#nav button.cur.done{color:#fff}
+#nav .time{margin-left:auto;color:var(--muted);font-size:.9rem}
+main{max-width:1000px;margin:0 auto;padding:14px}
+.step{display:none}
+.step.cur{display:block}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin:0 0 14px}
+h2{margin:0 0 8px;font-size:1.4rem;color:var(--navy)}
+h3{margin:14px 0 6px;font-size:1.1rem;color:var(--navy)}
+.lead{font-size:1.05rem}
+.goal{background:#eef5fd;border-left:5px solid var(--accent);border-radius:8px;padding:10px 14px;margin:0 0 14px}
+.goal ul{margin:4px 0 0;padding-left:20px}
+.hint{color:var(--muted);font-size:.92rem}
+.gate{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-top:12px}
+.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.opt{display:flex;gap:8px;align-items:flex-start;padding:8px 10px;border:1px solid var(--line);border-radius:10px;margin:5px 0;cursor:pointer;background:#fff}
+.opt input{margin-top:5px;transform:scale(1.25)}
+.opt.sel{border-color:var(--accent);background:#eef5fd}
+.opt.right{border-color:var(--ok);background:#ecfdf3}
+.opt.wrong{border-color:var(--bad);background:#fef2f2}
+.fb{margin-top:6px;font-size:.98rem}
+.fb.good{color:var(--ok)}
+.fb.bad{color:var(--bad)}
+.task{margin:0 0 16px;padding-bottom:6px}
+.task .q{font-weight:600;margin-bottom:4px}
+.tip{margin:6px 0;background:#fffbeb;border:1px solid #f3d98a;border-radius:8px;padding:4px 10px}
+.tip summary{cursor:pointer;font-weight:600}
+table.t{border-collapse:collapse;margin:6px 0;font-size:.97rem}
+table.t th,table.t td{border:1px solid var(--line);padding:5px 12px;text-align:center}
+table.t th{background:#eef5fd}
+.he{background:#fffdf5;border:2px solid #e6d28a;border-radius:12px;padding:12px 16px;margin:16px 0}
+.he h3.hh{margin:0 0 4px;font-size:1.05rem;color:#7a5b00}
+.he .hl2{font-size:1.2rem;font-weight:700;margin:10px 0 2px;color:var(--navy)}
+.he .hl3{font-size:1.02rem;font-weight:700;margin:8px 0 2px;color:var(--navy)}
+.he p{margin:2px 0 6px}
+.he select{font-size:.98rem;padding:3px 4px;border:2px solid #b8c4d2;border-radius:6px;background:#fff;max-width:100%}
+.he select.ok{border-color:var(--ok);background:#ecfdf3}
+.he select.no{border-color:var(--bad);background:#fef2f2}
+.he textarea,.own{width:100%;min-height:54px;border:1px solid var(--line);border-radius:8px;padding:6px;margin-top:4px}
+.copyrow{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:10px}
+#simWrap{position:relative;border:1px solid var(--line);border-radius:12px;overflow:hidden;background:#fff}
+#simFrame{width:100%;height:760px;border:0;display:block}
+#simWrap.full{position:fixed;inset:0;z-index:50;border-radius:0;border:0}
+#simWrap.full #simFrame{height:calc(100vh - 52px)}
+#simBar{display:flex;gap:8px;padding:6px 8px;background:#12304f;color:#fff;align-items:center;justify-content:space-between;flex-wrap:wrap}
+#simBar button{background:transparent;color:#fff;border-color:#5d7fa3;min-height:36px;padding:4px 12px}
+.sortgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:8px}
+.bin{border:2px dashed #9fb3c8;border-radius:12px;padding:8px;min-height:130px;cursor:pointer;background:#fafcff}
+.bin h4{margin:0 0 6px;text-align:center;color:var(--navy)}
+.bin.hot{border-color:var(--accent);background:#eef5fd}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0}
+.chip{border:2px solid #9fb3c8;border-radius:20px;padding:6px 14px;background:#fff;cursor:pointer;user-select:none}
+.chip.sel{border-color:var(--accent);background:#dbeafe;font-weight:700}
+.chip.good{border-color:var(--ok);background:#ecfdf3;cursor:default}
+.chip.shake{animation:sh .35s}
+@keyframes sh{20%{transform:translateX(-6px)}60%{transform:translateX(6px)}}
+.ampel{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0}
+.ampel button{min-width:130px}
+.ampel button.sel.g{background:#dcfce7;border-color:var(--ok)}
+.ampel button.sel.y{background:#fef9c3;border-color:#ca8a04}
+.ampel button.sel.r{background:#fee2e2;border-color:var(--bad)}
+.wsvg{width:100%;height:auto;background:#fff;border:1px solid var(--line);border-radius:10px}
+.wk{display:flex;gap:16px;flex-wrap:wrap;margin:8px 0}
+.wk .ctl{display:flex;gap:6px;align-items:center;border:1px solid var(--line);border-radius:10px;padding:6px 10px}
+.wk .ctl b{min-width:1.5em;text-align:center}
+.modal{position:fixed;inset:0;background:rgba(10,25,45,.55);z-index:60;display:none;align-items:center;justify-content:center;padding:14px}
+.modal.on{display:flex}
+.modal .box{background:#fff;border-radius:14px;max-width:680px;max-height:86vh;overflow:auto;padding:16px 20px}
+.legend{display:flex;gap:14px;flex-wrap:wrap;align-items:center;font-size:.95rem;margin:4px 0}
+.schema svg{width:100%;height:auto}
+.imgs{display:flex;gap:12px;flex-wrap:wrap}
+.imgs svg{max-width:100%;height:auto}
+.pill{display:inline-block;border-radius:999px;padding:1px 10px;font-size:.85rem;background:#eef5fd;border:1px solid #b9d3f0}
+@media(max-width:700px){.sortgrid{grid-template-columns:1fr}#simFrame{height:640px}}
+.pse{display:grid;grid-template-columns:28px repeat(8,minmax(0,1fr));gap:4px;max-width:640px}
+.pse .ph{text-align:center;color:var(--muted);font-size:.85rem;align-self:center}
+.tile{padding:0;min-height:46px;font-weight:700;font-size:1.1rem;border-radius:8px;border:2px solid #9aa5b1}
+.tile.cM{background:#cfe0f5}.tile.cH{background:#cfeccf}.tile.cN{background:#fdeeb0}
+.tile.sg{color:#c0262d}.tile.sl{color:#1d4ed8}.tile.ss{color:#111}
+.tile.on{border-color:#dc2626;box-shadow:0 0 0 2px #dc2626}
+.sw{display:inline-block;width:16px;height:16px;border-radius:4px;border:1px solid #9aa5b1;vertical-align:-3px}
+.wk button.sel{background:#dbeafe;border-color:var(--accent);font-weight:700}
+</style>
+</head>
+<body>
+<header>
+  <div><h1>Chemie 9 · Doppelstunde 2 · Periodensystem und Masseerhalt</h1><p>Selbstständig arbeiten · Tablet · ca. 90 Minuten</p></div>
+  <button id="wsBtn">📖 Wortspeicher</button>
+</header>
+<div id="nav"></div>
+<main>
+
+<!-- ============ 0 START ============ -->
+<section class="step" data-s="0">
+  <div class="card">
+    <h2>Willkommen: Ordnung im Periodensystem, Ordnung bei den Massen</h2>
+    <p class="lead">Letzte Woche hast du Wasser zerlegt und mit Daltons Atomen erklärt. Heute lernst du das <b>Periodensystem der Elemente</b> in Grundzügen kennen. Danach findest du heraus, <b>was bei einer Reaktion mit der Masse passiert</b>: Wird ein brennendes Stück Holz leichter, schwerer oder bleibt es gleich? Du arbeitest wieder ohne Lehrkraft. Die Seite gibt dir bei jeder Aufgabe sofort Rückmeldung.</p>
+    <div class="goal"><b>Du kannst danach:</b>
+      <ul>
+        <li>das <b>Periodensystem</b> lesen (Perioden, Hauptgruppen) und Elemente in Metalle, Halbmetalle und Nichtmetalle einteilen,</li>
+        <li><b>offene und geschlossene Systeme</b> unterscheiden und Massenänderungen erklären,</li>
+        <li>den <b>Satz von der Erhaltung der Masse</b> mit dem Atommodell nach Dalton begründen.</li>
+      </ul>
+    </div>
+    <h3>Ablauf (Richtwerte)</h3>
+    <table class="t">
+      <tr><th>Schritt</th><th>Was</th><th>Zeit</th></tr>
+      <tr><td>0</td><td>Wiederholung aus Doppelstunde 1</td><td>8 min</td></tr>
+      <tr><td>1</td><td>Periodensystem + Hefteintrag 4</td><td>25 min</td></tr>
+      <tr><td>2</td><td>Waage-Werkstatt: Masse bei Reaktionen</td><td>20 min</td></tr>
+      <tr><td>3</td><td>Erklärung, Teilchenebene + Hefteintrag 5</td><td>25 min</td></tr>
+      <tr><td>4</td><td>Selbstcheck-Test auf mebis + Reflexion</td><td>12 min</td></tr>
+    </table>
+    <h3>So arbeitest du</h3>
+    <ul>
+      <li>Die Aufgaben schalten nacheinander „Weiter“ frei. Bei einer falschen Antwort bekommst du einen Hinweis und versuchst es noch einmal.</li>
+      <li>Die <b>Hefteinträge</b> füllst du hier mit Auswahllisten aus. Danach kopierst du sie mit einem Klick in dein digitales Heft. Du kannst eigene Ergänzungen anfügen.</li>
+      <li>Wenn du nicht weiterkommst: Tipp aufklappen, im <b>Wortspeicher</b> (oben rechts) nachsehen, dann eine Mitschülerin oder einen Mitschüler fragen.</li>
+      <li><b>Lade die Seite nicht neu.</b> Sonst gehen deine Eingaben verloren.</li>
+    </ul>
+    <h3>Wiederholung aus Doppelstunde 1</h3>
+    <div id="r1" class="task"></div>
+    <div id="r2" class="task"></div>
+    <div id="r3" class="task"></div>
+    <div class="gate"><button class="primary next">Los geht's ▶</button><span class="hint need"></span></div>
+  </div>
+</section>
+
+<!-- ============ 1 PSE ============ -->
+<section class="step" data-s="1">
+  <div class="card">
+    <h2>4 Das Periodensystem der Elemente (PSE)</h2>
+    <div class="goal"><b>Du kannst danach:</b> die Position eines Elements im PSE angeben und es als Metall, Halbmetall oder Nichtmetall einordnen.</div>
+    <p class="lead">Bisher kennst du Wasserstoff, Sauerstoff, Eisen, Schwefel und Magnesium. Es gibt über 100 Elemente. Damit man den Überblick behält, hat man sie im <b>Periodensystem</b> geordnet. Hier siehst du einen Ausschnitt mit den <b>Hauptgruppen</b> und den ersten fünf <b>Perioden</b>. Tippe auf ein Element.</p>
+    <div class="legend" id="pseLeg"></div>
+    <div id="pse"></div>
+    <div id="pseInfo" class="card" style="margin-top:10px;background:#f8fafc"><span class="hint">Tippe auf ein Element, um Name, lateinischen Namen und Eigenschaften zu sehen.</span></div>
+    <p class="hint">Waagrechte Zeilen heißen <b>Perioden</b> (1 bis 7), senkrechte Spalten heißen <b>Hauptgruppen</b> (I bis VIII). Das Periodensystem hat insgesamt 7 Perioden. Hier siehst du die ersten fünf.</p>
+  </div>
+  <div class="card">
+    <h3>Aufgaben</h3>
+    <div class="task" id="tCls"><div class="q">a) Ordne die Elemente mithilfe des Periodensystems ein.</div><div id="clsRows"></div><div class="fb" id="clsFb"></div></div>
+    <div id="tH" class="task"></div>
+    <div id="tPos" class="task"></div>
+    <div id="tGas" class="task"></div>
+    <div id="tSym" class="task"></div>
+    <div id="he4"></div>
+    <div class="gate"><button class="primary next">Weiter zur Waage-Werkstatt ▶</button><span class="hint need"></span></div>
+  </div>
+</section>
+
+<!-- ============ 2 MASSE ============ -->
+<section class="step" data-s="2">
+  <div class="card">
+    <h2>5.1 Was passiert mit der Masse? Die Waage-Werkstatt</h2>
+    <div class="goal"><b>Du kannst danach:</b> <b>offene</b> und <b>geschlossene Systeme</b> unterscheiden und erklären, warum sich die Masse im offenen System ändern kann.</div>
+    <p class="lead">Beim Verbrennen verschwindet Holz scheinbar, und Eisenwolle wird beim Glühen fest. Wiegt man vorher und nachher, kommt es darauf an, <b>wo</b> die Reaktion stattfindet:</p>
+    <ul>
+      <li>im <b>offenen System</b>: Gefäß oben offen, Stoffe können mit der Luft ausgetauscht werden,</li>
+      <li>im <b>geschlossenen System</b>: Gefäß dicht verschlossen, es tritt nichts ein oder aus.</li>
+    </ul>
+    <p class="hint">Die Massen in dieser Werkstatt sind typische Beispielwerte aus Schulversuchen. Wiege dabei das gesamte Gerät mit.</p>
+    <div class="wk" id="expBtns"></div>
+    <div id="scaleWrap" style="max-width:520px"></div>
+    <div class="row"><button id="runBtn" class="primary">▶ Reaktion starten</button><button id="resetBtn">↺ Zurücksetzen</button><span class="hint" id="expMsg"></span></div>
+    <h3>Deine Messtabelle</h3>
+    <p class="hint">Starte alle vier Versuche. Danach wählst du jeweils aus, wie sich die Masse verändert hat.</p>
+    <table class="t" id="expTab"></table>
+    <div class="fb" id="expFb"></div>
+    <p class="hint">Zum Ansehen (freiwillig): <a href="https://dl.ccb-online.de/chemie/it1_eisen/" target="_blank" rel="noopener">Simulation Verbrennung von Eisenwolle</a> · <a href="https://dl.ccb-online.de/chemie/it5_verbrennung_von_holz/" target="_blank" rel="noopener">Simulation Verbrennung von Holz</a> · <a href="https://www.ccbuchner.de/_files_media/mediathek/videos/5127.mp4" target="_blank" rel="noopener">Video: Verbrennung im Reagenzglas</a></p>
+  </div>
+  <div class="card">
+    <h3>Erkläre die Beobachtungen</h3>
+    <div id="eHolz" class="task"></div>
+    <div id="eEisen" class="task"></div>
+    <div id="eZu" class="task"></div>
+    <div class="gate"><button class="primary next">Weiter zur Erklärung ▶</button><span class="hint need"></span></div>
+  </div>
+</section>
+
+<!-- ============ 3 ERKLÄRUNG ============ -->
+<section class="step" data-s="3">
+  <div class="card">
+    <h2>5.2 Der Satz von der Erhaltung der Masse</h2>
+    <div class="goal"><b>Du kannst danach:</b> den Satz von der Erhaltung der Masse nennen und mit Atomen begründen.</div>
+    <p>Der französische Chemiker <b>Antoine Lavoisier</b> wog im 18. Jahrhundert sehr genau. Sein Ergebnis:</p>
+    <div class="goal" style="font-size:1.05rem"><b>Satz von der Erhaltung der Masse:</b> Bei einer chemischen Reaktion in einem <b>geschlossenen System</b> ist die Gesamtmasse der Ausgangsstoffe gleich der Gesamtmasse der Produkte.</div>
+    <h3>Aufgabe: offen oder geschlossen?</h3>
+    <p class="hint">Tippe auf ein Beispiel und dann auf die richtige Spalte.</p>
+    <div class="chips" id="chips"></div>
+    <div class="sortgrid" id="bins" style="grid-template-columns:repeat(2,1fr)"></div>
+    <div class="fb" id="sortFb"></div>
+    <div id="tSatz" class="task" style="margin-top:16px"></div>
+  </div>
+  <div class="card">
+    <h2>Erklärung mit Atomen (Dalton)</h2>
+    <p class="lead">Warum bleibt die Masse gleich? Bei einer Reaktion werden Atome nur <b>umgruppiert</b>. Es kommt kein Atom dazu, und keins geht verloren. Jedes Atom behält seine Masse.</p>
+    <div class="legend"><span><svg width="26" height="26"><circle cx="13" cy="13" r="12" fill="#4b5563" stroke="#111827" stroke-width="1.6"/></svg> Kohlenstoff-Atom (C)</span><span><svg width="26" height="26"><circle cx="13" cy="13" r="12" fill="#e5483b" stroke="#9b2217" stroke-width="1.6"/></svg> Sauerstoff-Atom (O)</span></div>
+    <p>Beispiel Aktivkohle: Kohlenstoff verbrennt mit Sauerstoff zu Kohlenstoffdioxid (CO₂). Baue rechts die Produkte.</p>
+    <p id="wkTask" class="lead"></p>
+    <svg id="wsvg" class="wsvg" viewBox="0 0 780 300"></svg>
+    <div class="wk" id="wkCtl"></div>
+    <table class="t" id="wkCount"></table>
+    <div class="fb" id="wkFb"></div>
+    <div class="row"><button id="wkRun" class="primary" disabled>Umgruppierung zeigen</button><button id="wkPng" disabled>Bild für mein Heft speichern</button></div>
+  </div>
+  <div class="card">
+    <div id="tEq" class="task"></div>
+    <div class="task" id="tNum"><div class="q">Rechenaufgabe: 12 g Kohlenstoff (Aktivkohle) verbrennen in einem <b>geschlossenen</b> Kolben mit 32 g Sauerstoff vollständig zu Kohlenstoffdioxid. Wie viel Gramm Kohlenstoffdioxid entstehen?</div>
+      <div class="row"><input id="numIn" type="number" inputmode="decimal" style="width:110px;padding:8px;border:1px solid var(--line);border-radius:8px"> g <button id="numBtn">Prüfen</button></div>
+      <details class="tip"><summary>Tipp</summary>Im geschlossenen System ändert sich die Gesamtmasse nicht. Was wiegen die Ausgangsstoffe zusammen?</details>
+      <div class="fb" id="numFb"></div></div>
+    <div id="he5"></div>
+    <div class="gate"><button class="primary next">Weiter zum Abschluss ▶</button><span class="hint need"></span></div>
+  </div>
+</section>
+
+<!-- ============ 4 ABSCHLUSS ============ -->
+<section class="step" data-s="4">
+  <div class="card">
+    <h2>Abschluss</h2>
+    <h3>1 · Wie sicher fühlst du dich?</h3>
+    <div id="ampel"></div>
+    <h3>2 · Selbstcheck-Test „PSE und Masseerhalt“ auf mebis (ca. 10–15 Minuten)</h3>
+    <p>Der Selbstcheck prüft, was du heute gelernt hast. Du bekommst nach jeder Frage eine Rückmeldung. Am Ende steht eine kurze Reflexion. Du musst dafür bei mebis angemeldet sein.</p>
+    <p><a id="testLink" class="pill" href="#" target="_blank" rel="noopener" style="font-size:1.05rem;padding:8px 16px">▶ Selbstcheck-Test „PSE und Masseerhalt“ öffnen</a> <span class="hint" id="testHint"></span></p>
+    <h3>3 · Alle Hefteinträge auf einmal kopieren</h3>
+    <p class="hint">Falls du einen Eintrag vergessen hast: Hier ist alles zusammen.</p>
+    <div class="copyrow"><button id="copyAll" class="primary">Alles in die Zwischenablage kopieren</button><span class="hint" id="copyAllMsg"></span></div>
+    <p class="hint" style="margin-top:14px">Geschafft: Du kennst jetzt die Ordnung der Elemente im Periodensystem und weißt, dass bei chemischen Reaktionen im geschlossenen System keine Masse verloren geht.</p>
+  </div>
+</section>
+
+</main>
+
+<div class="modal" id="wsModal"><div class="box">
+  <h2>Wortspeicher</h2>
+  <ul>
+    <li><b>Periodensystem (PSE):</b> Ordnung aller Elemente in Perioden (Zeilen) und Gruppen (Spalten).</li>
+    <li><b>Periode:</b> waagrechte Zeile im PSE.</li>
+    <li><b>Hauptgruppe:</b> senkrechte Spalte im PSE (I bis VIII).</li>
+    <li><b>Metall / Halbmetall / Nichtmetall:</b> Einteilung der Elemente nach ihren Eigenschaften.</li>
+    <li><b>Elementsymbol:</b> Kürzel aus ein bis zwei Buchstaben, z. B. Mg für Magnesium, oft vom lateinischen Namen.</li>
+    <li><b>(s), (l), (g):</b> fest, flüssig, gasförmig. Mg (s) meint den festen Stoff Magnesium.</li>
+    <li><b>offenes System:</b> Stoffe können mit der Umgebung ausgetauscht werden.</li>
+    <li><b>geschlossenes System:</b> kein Stoff tritt ein oder aus.</li>
+    <li><b>Satz von der Erhaltung der Masse:</b> im geschlossenen System ist die Gesamtmasse vor und nach der Reaktion gleich (Lavoisier).</li>
+    <li><b>Edukte / Produkte:</b> Ausgangsstoffe / entstehende Stoffe einer Reaktion.</li>
+  </ul>
+  <button class="primary" id="wsClose">Schließen</button>
+</div></div>
+<script>
+/* gemeinsame Zeichenfunktionen (Lernseite + Testbilder) */
+var DRAW = (function () {
+  var COL = { O: ['#e5483b', '#9b2217', 17], H: ['#ffffff', '#6b7684', 11], A: ['#3b82d6', '#1d4f91', 16], B: ['#f59e0b', '#a35f00', 11], C: ['#4b5563', '#111827', 16] };
+  var MOLS = {
+    H2O: [['O', 0, -4], ['H', -19, 12], ['H', 19, 12]],
+    H2: [['H', -11, 0], ['H', 11, 0]],
+    O2: [['O', -17, 0], ['O', 17, 0]],
+    A2: [['A', -16, 0], ['A', 16, 0]],
+    B2: [['B', -11, 0], ['B', 11, 0]],
+    AB2: [['A', 0, -4], ['B', -20, 13], ['B', 20, 13]],
+    C1: [['C', 0, 0]],
+    CO2: [['O', -34, 0], ['C', 0, 0], ['O', 34, 0]]
+  };
+  function atom(t, x, y, extra) {
+    var c = COL[t];
+    return '<circle cx="' + x + '" cy="' + y + '" r="' + c[2] + '" fill="' + c[0] + '" stroke="' + c[1] + '" stroke-width="1.6" data-t="' + t + '"' + (extra || '') + '/>';
+  }
+  function mol(name, x, y) {
+    return MOLS[name].map(function (a) { return atom(a[0], x + a[1], y + a[2]); }).join('');
+  }
+  function grid(names, x0, y0, cols, dx, dy) {
+    return names.map(function (n, i) { return mol(n, x0 + (i % cols) * dx, y0 + Math.floor(i / cols) * dy); }).join('');
+  }
+  function rep(n, k) { var a = []; for (var i = 0; i < k; i++) a.push(n); return a; }
+  function frame(inner, w, h, label) {
+    return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ' + w + ' ' + h + '" width="' + w + '" height="' + h + '" font-family="Segoe UI,Arial,sans-serif">' +
+      '<rect x="1" y="1" width="' + (w - 2) + '" height="' + (h - 2) + '" rx="10" fill="#fff" stroke="#8aa0b8" stroke-width="2"/>' + inner +
+      (label ? '<text x="14" y="26" font-size="20" font-weight="700" fill="#12304f">' + label + '</text>' : '') + '</svg>';
+  }
+  /* Teilchenbild: kind = element | verbindung | gemisch */
+  function part(kind, label) {
+    var names;
+    if (kind === 'element') names = rep('A2', 6);
+    else if (kind === 'verbindung') names = rep('AB2', 6);
+    else names = ['A2', 'B2', 'B2', 'A2', 'B2', 'A2'];
+    var seq = kind === 'gemisch' ? ['A2', 'B2', 'A2', 'B2', 'B2', 'A2'] : names;
+    return frame(grid(seq, 52, 62, 3, 78, 56), 270, 150, label);
+  }
+  /* Hofmann-Skizze: Gas sammelt sich oben, Skala beginnt oben bei 0 mL und wächst nach unten */
+  function hofmann(vMinus, vPlus) {
+    var H = 175, top = 46, MAX = 25, per = H / MAX;
+    function tube(x, v, lab) {
+      var gh = v * per, g = '';
+      g += '<rect x="' + (x + 12) + '" y="' + (top - 14) + '" width="10" height="14" fill="#9aa5b1" stroke="#6b7684"/>';
+      g += '<rect x="' + x + '" y="' + top + '" width="34" height="' + H + '" fill="#8cc8f2" stroke="#44617f" stroke-width="2"/>';
+      g += '<rect x="' + (x + 1) + '" y="' + (top + 1) + '" width="32" height="' + gh + '" fill="#f1f3f5"/>';
+      g += '<line x1="' + (x + 1) + '" y1="' + (top + gh) + '" x2="' + (x + 33) + '" y2="' + (top + gh) + '" stroke="#1d4f91" stroke-width="2"/>';
+      if (gh > 30) g += '<text x="' + (x + 17) + '" y="' + (top + gh / 2 + 4) + '" text-anchor="middle" font-size="11" fill="#5b6b7c">Gas</text>';
+      g += '<text x="' + (x + 17) + '" y="' + (top + gh + (H - gh) / 2 + 4) + '" text-anchor="middle" font-size="11" fill="#12304f">Wasser</text>';
+      for (var i = 0; i <= MAX; i += 5) {
+        var y = top + i * per;
+        g += '<line x1="' + (x + 34) + '" y1="' + y + '" x2="' + (x + 44) + '" y2="' + y + '" stroke="#44617f"/><text x="' + (x + 48) + '" y="' + (y + 4) + '" font-size="12" fill="#12304f">' + i + '</text>';
+      }
+      g += '<text x="' + (x + 17) + '" y="' + (top + H + 24) + '" text-anchor="middle" font-size="14" font-weight="700" fill="#12304f">' + lab + '</text>';
+      return g;
+    }
+    var inner = tube(50, vMinus, 'Minuspol') + tube(190, vPlus, 'Pluspol') +
+      '<text x="14" y="22" font-size="12" fill="#5b6b7c">Skala in mL (0 mL oben, Gas oben)</text>';
+    return frame(inner, 290, 270);
+  }
+  /* Gleichungsbilder A-D (Zerlegung von 2 Wasser-Teilchen) */
+  function eq(kind, label) {
+    var left = mol('H2O', 50, 62) + mol('H2O', 120, 62);
+    var rights = {
+      ok: mol('H2', 240, 55) + mol('H2', 240, 100) + mol('O2', 330, 78),
+      fewH: mol('H2', 250, 75) + mol('O2', 330, 75),
+      oneO: mol('H2', 240, 60) + mol('H2', 290, 60) + mol('H2', 340, 60) + mol('O2', 290, 105),
+      water: mol('H2O', 260, 75) + mol('H2O', 335, 75)
+    };
+    var inner = left + '<text x="165" y="86" font-size="26" fill="#12304f">→</text>' + rights[kind];
+    return frame(inner, 380, 130, label);
+  }
+  /* Aktivkohle-Bilder: 3 C + 3 O2 -> ... */
+  function eqC(kind, label) {
+    var left = mol('C1', 40, 70) + mol('C1', 85, 70) + mol('C1', 130, 70) + mol('O2', 60, 118) + mol('O2', 130, 118) + mol('O2', 200, 118);
+    var R = {
+      ok: mol('CO2', 360, 55) + mol('CO2', 360, 100) + mol('CO2', 360, 145),
+      extra: mol('CO2', 330, 55) + mol('CO2', 330, 100) + mol('CO2', 330, 145) + mol('O2', 430, 100),
+      less: mol('CO2', 360, 70) + mol('CO2', 360, 120),
+      none: mol('C1', 290, 70) + mol('C1', 335, 70) + mol('C1', 380, 70) + mol('O2', 310, 118) + mol('O2', 380, 118) + mol('O2', 450, 118)
+    };
+    var inner = left + '<text x="238" y="100" font-size="26" fill="#12304f">→</text>' + R[kind];
+    return frame(inner, 500, 180, label);
+  }
+  /* PSE-Skizze (Hauptgruppen, Periode 1-5); hl = markiertes Symbol */
+  var PSE_ROWS = [
+    ['H', '', '', '', '', '', '', 'He'], ['Li', 'Be', 'B', 'C', 'N', 'O', 'F', 'Ne'], ['Na', 'Mg', 'Al', 'Si', 'P', 'S', 'Cl', 'Ar'],
+    ['K', 'Ca', 'Ga', 'Ge', 'As', 'Se', 'Br', 'Kr'], ['Rb', 'Sr', 'In', 'Sn', 'Sb', 'Te', 'I', 'Xe']];
+  function pse(hl, label) {
+    var rom = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII'], g = '';
+    rom.forEach(function (r, i) { g += '<text x="' + (50 + i * 40 + 20) + '" y="46" text-anchor="middle" font-size="13" fill="#5b6b7c">' + r + '</text>'; });
+    PSE_ROWS.forEach(function (row, ri) {
+      g += '<text x="26" y="' + (74 + ri * 34) + '" text-anchor="middle" font-size="13" fill="#5b6b7c">' + (ri + 1) + '</text>';
+      row.forEach(function (sy, ci) {
+        if (!sy) return;
+        var x = 50 + ci * 40, y = 56 + ri * 34, on = sy === hl;
+        g += '<rect x="' + x + '" y="' + y + '" width="38" height="32" rx="3" fill="' + (on ? '#fde68a' : '#eef2f6') + '" stroke="' + (on ? '#dc2626' : '#9aa5b1') + '" stroke-width="' + (on ? 3 : 1) + '"/>' +
+          '<text x="' + (x + 19) + '" y="' + (y + 21) + '" text-anchor="middle" font-size="14" font-weight="' + (on ? 700 : 400) + '" fill="#12304f">' + (on ? '?' : sy) + '</text>';
+      });
+    });
+    return frame(g, 380, 240, label || '');
+  }
+  return { PSE_ROWS: PSE_ROWS, eqC: eqC, pse: pse, atom: atom, mol: mol, grid: grid, part: part, hofmann: hofmann, eq: eq, COL: COL, MOLS: MOLS, frame: frame };
+})();
+if (typeof module !== 'undefined') module.exports = DRAW;
+
+</script>
+<script>
+(function(){
+'use strict';
+var $ = function(id){ return document.getElementById(id); };
+var $$ = function(s, r){ return Array.prototype.slice.call((r || document).querySelectorAll(s)); };
+var shuffle = function(a){ a = a.slice(); for (var i = a.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)); var t = a[i]; a[i] = a[j]; a[j] = t; } return a; };
+var esc = function(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); };
+/* ---------- Aufgabentypen ---------- */
+/* mc: Einfachauswahl mit Wiederholung bis richtig; multi: Mehrfachauswahl mit Prüfen */
+function mc(el, cfg) {
+  el.classList.add('task');
+  var order = shuffle(cfg.opts.map(function(o, i){ return i; }));
+  var html = '<div class="q">' + cfg.q + '</div>' + (cfg.img ? '<div class="imgs">' + cfg.img + '</div>' : '') + '<div class="opts">';
+  order.forEach(function(i){
+    html += '<label class="opt"><input type="' + (cfg.multi ? 'checkbox' : 'radio') + '" name="' + (cfg.key || el.id) + '" value="' + i + '"> <span>' + cfg.opts[i].t + '</span></label>';
+  });
+  html += '</div>' + (cfg.multi ? '<button class="chk">Prüfen</button>' : '') + (cfg.tip ? '<details class="tip"><summary>Tipp</summary>' + cfg.tip + '</details>' : '') + '<div class="fb"></div>';
+  el.innerHTML = html;
+  var fb = el.querySelector('.fb'), done = false;
+  function fin() { done = true; $$('input', el).forEach(function(x){ x.disabled = true; }); if (cfg.onOk) cfg.onOk(); refresh(); }
+  if (!cfg.multi) {
+    $$('input', el).forEach(function(inp){ inp.addEventListener('change', function(){
+      if (done) return; var o = cfg.opts[+inp.value], lab = inp.closest('.opt');
+      if (o.ok) { lab.classList.add('right'); fb.className = 'fb good'; fb.innerHTML = '✓ ' + (o.fb || 'Richtig.'); fin(); }
+      else { lab.classList.add('wrong'); fb.className = 'fb bad'; fb.innerHTML = '✗ ' + (o.fb || 'Nicht ganz. Versuche es noch einmal.'); setTimeout(function(){ lab.classList.remove('wrong'); inp.checked = false; }, 1400); }
+    }); });
+  } else {
+    el.querySelector('.chk').addEventListener('click', function(){
+      if (done) return; var all = true, msgs = [];
+      $$('input', el).forEach(function(inp){ var o = cfg.opts[+inp.value], lab = inp.closest('.opt'); lab.classList.remove('right','wrong');
+        if (inp.checked !== !!o.ok) { all = false; lab.classList.add('wrong'); if (o.fb) msgs.push(o.fb); } else if (inp.checked) lab.classList.add('right'); });
+      if (all) { fb.className = 'fb good'; fb.innerHTML = '✓ ' + (cfg.okFb || 'Richtig.'); fin(); }
+      else { fb.className = 'fb bad'; fb.innerHTML = '✗ Noch nicht ganz. ' + msgs.join(' '); }
+    });
+  }
+}
+/* ---------- Hefteintrag-Baukasten ---------- */
+var HE = {};
+function gapHTML(text, id) {
+  return text.replace(/\[\[(.+?)\]\]/g, function(_, g){
+    var opts = g.split(';'), right = null;
+    opts = opts.map(function(o){ if (o.slice(-1) === '*') { o = o.slice(0, -1); right = o; } return o; });
+    return '<select data-r="' + esc(right) + '"><option value="">…</option>' + shuffle(opts).map(function(o){ return '<option>' + esc(o) + '</option>'; }).join('') + '</select>';
+  });
+}
+function buildHE(id, title, blocks, key, withTable) {
+  var el = $(id), h = '<div class="he"><h3 class="hh">✏️ ' + title + '</h3><div class="hint">Wähle in jeder Lücke das richtige Wort. Dann kopierst du den Eintrag in dein Heft.</div>';
+  blocks.forEach(function(b){
+    if (b.h2) h += '<div class="hl2">' + b.h2 + '</div>';
+    else if (b.h3) h += '<div class="hl3">' + b.h3 + '</div>';
+    else if (b.p) h += '<p>' + gapHTML(b.p, id) + '</p>';
+    else if (b.table) h += '<div class="hetab"></div>';
+  });
+  h += '<div class="hl3">Eigene Ergänzung (freiwillig)</div><textarea class="own" placeholder="z. B. eine Skizze beschreiben, ein Beispiel, eine Frage an mich selbst …"></textarea>';
+  h += '<div class="copyrow"><button class="primary cpy" disabled>In die Zwischenablage kopieren</button><span class="hint msg">Zuerst alle Lücken richtig ausfüllen.</span></div></div>';
+  el.innerHTML = h; HE[id] = { el: el, key: key };
+  $$('select', el).forEach(function(s){ s.addEventListener('change', function(){
+    s.classList.remove('ok','no'); if (s.value) s.classList.add(s.value === s.dataset.r ? 'ok' : 'no');
+    var all = $$('select', el).every(function(x){ return x.value === x.dataset.r; });
+    S.ok[key] = all; $$('.cpy', el)[0].disabled = !all; $$('.msg', el)[0].textContent = all ? '✓ Alles richtig. Du kannst kopieren.' : 'Rot markierte Lücken noch einmal überlegen.'; refresh(); }); });
+  $$('.cpy', el)[0].addEventListener('click', function(){ copyHE([id], $$('.msg', el)[0]); });
+}
+function heContent(id) {
+  var el = HE[id].el.querySelector('.he'), html = '', plain = '';
+  Array.prototype.forEach.call(el.children, function(c){
+    if (c.classList.contains('hl2')) { html += '<h2>' + c.innerHTML + '</h2>'; plain += '\n' + c.textContent + '\n'; }
+    else if (c.classList.contains('hl3')) { if (/Eigene Erg/.test(c.textContent)) return; html += '<h3>' + c.innerHTML + '</h3>'; plain += '\n' + c.textContent + '\n'; }
+    else if (c.tagName === 'P') { var cl = c.cloneNode(true), vals = $$('select', c).map(function(x){ return x.value; }); $$('select', cl).forEach(function(s, k){ var b = document.createElement('b'); b.textContent = vals[k]; s.replaceWith(b); }); html += '<p>' + cl.innerHTML + '</p>'; plain += cl.textContent + '\n'; }
+    else if (c.classList.contains('hetab')) { var tb = c.querySelector('table'); if (tb) { html += tb.outerHTML; plain += $$('tr', tb).map(function(r){ return $$('th,td', r).map(function(x){ return x.textContent; }).join('\t'); }).join('\n') + '\n'; } }
+    else if (c.tagName === 'TEXTAREA' && c.value.trim()) { html += '<p><i>Meine Ergänzung: ' + esc(c.value) + '</i></p>'; plain += 'Meine Ergänzung: ' + c.value + '\n'; }
+  });
+  return { html: html, plain: plain };
+}
+function copyHE(ids, msgEl) {
+  var html = '', plain = '';
+  ids.forEach(function(id){ var c = heContent(id); html += c.html; plain += c.plain + '\n'; });
+  function ok() { msgEl.textContent = '✓ Kopiert. Jetzt in dein digitales Heft einfügen.'; }
+  function fallback() {
+    var d = document.createElement('div'); d.innerHTML = html; d.style.cssText = 'position:fixed;left:-9999px;top:0;'; document.body.appendChild(d);
+    var r = document.createRange(); r.selectNodeContents(d); var sel = window.getSelection(); sel.removeAllRanges(); sel.addRange(r);
+    var good = false; try { good = document.execCommand('copy'); } catch (e) {} sel.removeAllRanges(); document.body.removeChild(d);
+    if (good) ok(); else msgEl.textContent = 'Kopieren nicht möglich. Markiere den Text selbst und kopiere ihn.';
+  }
+  try {
+    if (navigator.clipboard && window.ClipboardItem) {
+      navigator.clipboard.write([new ClipboardItem({ 'text/html': new Blob([html], { type: 'text/html' }), 'text/plain': new Blob([plain], { type: 'text/plain' }) })]).then(ok, fallback);
+    } else fallback();
+  } catch (e) { fallback(); }
+}
+
+var MEBIS_TEST_URL = ''; /* mebis: Selbstcheck-Test - PSE und Masseerhalt (URL eintragen, sobald bekannt) */
+window.__MCS = [];
+var STEPS = [
+  { t: 'Start', min: 8 }, { t: '1 PSE', min: 25 }, { t: '2 Waage', min: 20 }, { t: '3 Erklärung', min: 25 }, { t: '4 Abschluss', min: 12 }
+];
+var S = { step: 0, max: 0, ok: {}, ampel: {}, exp: {}, expSel: {} };
+
+function need(i) {
+  var chk = function(keys, names) { var m = []; keys.forEach(function(k){ if (!S.ok[k]) m.push(names[k]); }); return m.length ? 'Noch offen: ' + m.join(', ') : ''; };
+  switch (i) {
+    case 1: return chk(['r1', 'r2', 'r3'], { r1: 'Wiederholung 1', r2: 'Wiederholung 2', r3: 'Wiederholung 3' });
+    case 2: return chk(['cls', 'h', 'pos', 'gas', 'sym', 'he4'], { cls: 'a)', h: 'b)', pos: 'c)', gas: 'd)', sym: 'e)', he4: 'Hefteintrag 4' });
+    case 3: return chk(['exp', 'eHolz', 'eEisen', 'eZu'], { exp: 'Messtabelle (alle vier Versuche)', eHolz: 'Erklärung Holz', eEisen: 'Erklärung Eisenwolle', eZu: 'Erklärung geschlossen' });
+    case 4: return chk(['sort', 'satz', 'werk', 'eq', 'num', 'he5'], { sort: 'Zuordnung', satz: 'Frage zum Satz', werk: 'Atom-Werkstatt (inkl. Umgruppierung zeigen)', eq: 'Teilchenbild', num: 'Rechenaufgabe', he5: 'Hefteintrag 5' });
+  }
+  return '';
+}
+function stepDone(i) { return i < S.max || (i === S.max && !need(i + 1) && i < 4 && i + 1 <= S.max); }
+function renderNav() {
+  var nav = $('nav'); nav.innerHTML = '';
+  STEPS.forEach(function(s, i){
+    var b = document.createElement('button'); b.textContent = s.t;
+    b.className = (i === S.step ? 'cur ' : '') + (i < S.max ? 'done' : '');
+    b.disabled = i > S.max; b.addEventListener('click', function(){ go(i); });
+    nav.appendChild(b);
+  });
+  var rest = 0; for (var i = S.step; i < STEPS.length; i++) rest += STEPS[i].min;
+  var t = document.createElement('span'); t.className = 'time'; t.textContent = 'noch ca. ' + rest + ' min'; nav.appendChild(t);
+}
+/* Sektion i ist "Weiter"-Ziel von i-1: Der Button in Sektion i prüft need(i+1) */
+function go(i) {
+  S.step = i; if (i > S.max) S.max = i;
+  $$('.step').forEach(function(s){ s.classList.toggle('cur', +s.dataset.s === i); });
+  if (i === 3) enterStep3();
+  renderNav(); refresh(); window.scrollTo(0, 0);
+}
+function refresh() {
+  $$('.step').forEach(function(sec){
+    var i = +sec.dataset.s, n = need(i + 1);
+    $$('.next', sec).forEach(function(b){ b.disabled = !!n; });
+    $$('.need', sec).forEach(function(h){ h.textContent = n; });
+  });
+  renderNav();
+}
+$$('.next').forEach(function(b){ b.addEventListener('click', function(){ go(S.step + 1); }); });
+$('wsBtn').addEventListener('click', function(){ $('wsModal').classList.add('on'); });
+$('wsClose').addEventListener('click', function(){ $('wsModal').classList.remove('on'); });
+
+/* registriert alle Auswahlfragen für die Längenprüfung */
+var mc0 = mc;
+mc = function(el, cfg) { window.__MCS.push({ id: el.id, opts: cfg.opts.map(function(o){ return { t: o.t, ok: !!o.ok }; }) }); mc0(el, cfg); };
+
+/* ---------- 0 Wiederholung ---------- */
+mc($('r1'), { q: 'Wasser lässt sich in Wasserstoff und Sauerstoff zerlegen. Was ist Wasser demnach?', opts: [
+  { t: 'Eine Verbindung, weil man den Stoff chemisch in andere Stoffe zerlegen kann.', ok: true, fb: 'Richtig: Verbindungen lassen sich chemisch zerlegen, Elemente nicht.' },
+  { t: 'Ein Element, weil Wasser ein Reinstoff aus einer einzigen Teilchensorte ist.', fb: 'Elemente lassen sich nicht zerlegen. Wasser aber schon.' },
+  { t: 'Ein Stoffgemisch, weil bei der Zerlegung zwei verschiedene Gase entstehen.', fb: 'Ein Stoffgemisch trennt man physikalisch. Wasser wurde chemisch zerlegt.' }], onOk: function(){ S.ok.r1 = true; } });
+mc($('r2'), { q: 'Was passiert nach Dalton mit den Atomen bei einer chemischen Reaktion?', opts: [
+  { t: 'Sie werden umgruppiert, und ihre Anzahl bleibt dabei gleich.', ok: true, fb: 'Richtig: Atome werden weder zerstört noch neu erzeugt.' },
+  { t: 'Sie verwandeln sich dabei in Atome eines anderen Elements.', fb: 'Atome eines Elements bleiben Atome dieses Elements.' },
+  { t: 'Sie werden zuerst zerstört und danach neu erzeugt.', fb: 'Atome werden nicht zerstört und nicht neu erzeugt.' }], onOk: function(){ S.ok.r2 = true; } });
+mc($('r3'), { q: 'Warum entsteht beim Zerlegen von Wasser doppelt so viel Wasserstoff wie Sauerstoff?', opts: [
+  { t: 'Ein Wasser-Teilchen enthält zwei Wasserstoff-Atome und ein Sauerstoff-Atom.', ok: true, fb: 'Richtig: Das Verhältnis 2 : 1 stammt aus dem Aufbau des Wasser-Teilchens.' },
+  { t: 'Ein Wasser-Teilchen enthält ein Wasserstoff-Atom und zwei Sauerstoff-Atome.', fb: 'Dann würde mehr Sauerstoff als Wasserstoff entstehen.' },
+  { t: 'Wasserstoff-Atome sind kleiner und passen doppelt so oft in das Rohr.', fb: 'Das Verhältnis kommt aus dem Aufbau der Teilchen, nicht aus der Größe.' }], onOk: function(){ S.ok.r3 = true; } });
+
+/* ---------- 1 PSE ---------- */
+/* Symbol, Name, lat. Name, Klasse (M Metall, H Halbmetall, N Nichtmetall), Zustand (g l s), Periode, Hauptgruppe */
+var EL = [
+  ['H','Wasserstoff','Hydrogenium','N','g',1,1],['He','Helium','Helium','N','g',1,8],
+  ['Li','Lithium','Lithium','M','s',2,1],['Be','Beryllium','Beryllium','M','s',2,2],['B','Bor','Borum','H','s',2,3],['C','Kohlenstoff','Carboneum','N','s',2,4],['N','Stickstoff','Nitrogenium','N','g',2,5],['O','Sauerstoff','Oxygenium','N','g',2,6],['F','Fluor','Fluorum','N','g',2,7],['Ne','Neon','Neon','N','g',2,8],
+  ['Na','Natrium','Natrium','M','s',3,1],['Mg','Magnesium','Magnesium','M','s',3,2],['Al','Aluminium','Aluminium','M','s',3,3],['Si','Silicium','Silicium','H','s',3,4],['P','Phosphor','Phosphorus','N','s',3,5],['S','Schwefel','Sulfur','N','s',3,6],['Cl','Chlor','Chlorum','N','g',3,7],['Ar','Argon','Argon','N','g',3,8],
+  ['K','Kalium','Kalium','M','s',4,1],['Ca','Calcium','Calcium','M','s',4,2],['Ga','Gallium','Gallium','M','s',4,3],['Ge','Germanium','Germanium','H','s',4,4],['As','Arsen','Arsenicum','H','s',4,5],['Se','Selen','Selenium','N','s',4,6],['Br','Brom','Bromum','N','l',4,7],['Kr','Krypton','Krypton','N','g',4,8],
+  ['Rb','Rubidium','Rubidium','M','s',5,1],['Sr','Strontium','Strontium','M','s',5,2],['In','Indium','Indium','M','s',5,3],['Sn','Zinn','Stannum','M','s',5,4],['Sb','Antimon','Stibium','H','s',5,5],['Te','Tellur','Tellurium','H','s',5,6],['I','Iod','Iodum','N','s',5,7],['Xe','Xenon','Xenon','N','g',5,8]
+];
+var CLS = { M: 'Metall', H: 'Halbmetall', N: 'Nichtmetall' }, ST = { g: 'gasförmig', l: 'flüssig', s: 'fest' };
+var ROM = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII'];
+function elByName(n) { return EL.filter(function(e){ return e[1] === n; })[0]; }
+(function(){
+  $('pseLeg').innerHTML = '<span><span class="sw" style="background:#cfe0f5"></span> Metall</span><span><span class="sw" style="background:#cfeccf"></span> Halbmetall</span><span><span class="sw" style="background:#fdeeb0"></span> Nichtmetall</span>' +
+    '<span>Symbolfarbe bei Raumtemperatur: <b style="color:#c0262d">rot = Gas</b> · <b style="color:#1d4ed8">blau = flüssig</b> · <b style="color:#111">schwarz = fest</b></span>';
+  var h = '<div class="pse"><div></div>' + ROM.map(function(r){ return '<div class="ph">' + r + '</div>'; }).join('');
+  for (var p = 1; p <= 5; p++) {
+    h += '<div class="ph">' + p + '</div>';
+    for (var g = 1; g <= 8; g++) {
+      var e = EL.filter(function(x){ return x[5] === p && x[6] === g; })[0];
+      if (!e) { h += '<div></div>'; continue; }
+      h += '<button class="tile c' + e[3] + ' s' + e[4] + '" data-s="' + e[0] + '">' + e[0] + '</button>';
+    }
+  }
+  $('pse').innerHTML = h + '</div>';
+  $$('#pse .tile').forEach(function(b){ b.addEventListener('click', function(){
+    var e = EL.filter(function(x){ return x[0] === b.dataset.s; })[0];
+    $$('#pse .tile').forEach(function(t){ t.classList.remove('on'); }); b.classList.add('on');
+    $('pseInfo').innerHTML = '<b style="font-size:1.2rem">' + e[0] + '</b> · ' + e[1] + ' <span class="hint">(lateinisch: ' + e[2] + ')</span><br>' + CLS[e[3]] + ' · bei Raumtemperatur ' + ST[e[4]] + ' · Periode ' + e[5] + ' · Hauptgruppe ' + ROM[e[6] - 1];
+  }); });
+})();
+/* a) Einordnen */
+(function(){
+  var items = [['Natrium', 'M'], ['Silicium', 'H'], ['Sauerstoff', 'N'], ['Calcium', 'M'], ['Argon', 'N'], ['Germanium', 'H']], ok = 0;
+  $('clsRows').innerHTML = shuffle(items).map(function(it){ return '<div class="row" style="margin:6px 0"><b style="min-width:110px">' + it[0] + '</b><select class="cs" data-r="' + it[1] + '"><option value="">wähle</option><option value="M">Metall</option><option value="H">Halbmetall</option><option value="N">Nichtmetall</option></select><span class="hint cf"></span></div>'; }).join('');
+  $$('.cs').forEach(function(s){ s.addEventListener('change', function(){ var cf = s.parentNode.querySelector('.cf'), nm = s.parentNode.querySelector('b').textContent, e = elByName(nm);
+    if (s.value === s.dataset.r) { s.style.borderColor = '#15803d'; cf.textContent = '✓ ' + nm + ' (' + e[0] + ') steht in Periode ' + e[5] + ', Hauptgruppe ' + ROM[e[6] - 1] + '.'; }
+    else { s.style.borderColor = '#b91c1c'; cf.textContent = '✗ Schau auf die Farbe des Feldes im Periodensystem.'; }
+    S.ok.cls = $$('.cs').every(function(x){ return x.value === x.dataset.r; }); if (S.ok.cls) $('clsFb').innerHTML = '<span class="fb good">✓ Alle richtig.</span>'; refresh(); }); });
+})();
+mc($('tH'), { q: 'b) Wasserstoff steht links oben im Periodensystem. Zu welcher Klasse gehört er?', opts: [
+  { t: 'Zu den Nichtmetallen: Er ist ein Gas ohne metallische Eigenschaften.', ok: true, fb: 'Richtig: Obwohl H links steht, ist es ein Nichtmetall (ein farbloses Gas).' },
+  { t: 'Zu den Metallen: Er steht in der I. Hauptgruppe wie Lithium und Natrium.', fb: 'Die Lage täuscht. Wasserstoff ist ein Gas und hat keine metallischen Eigenschaften.' },
+  { t: 'Zu den Halbmetallen: Er liegt zwischen Metallen und Nichtmetallen.', fb: 'Halbmetalle liegen im PSE in einem schrägen Streifen, nicht links oben.' }], onOk: function(){ S.ok.h = true; } });
+mc($('tPos'), { q: 'c) Wo findest du Kalium (K) im Periodensystem?', opts: [
+  { t: 'In der 4. Periode (Zeile) und in der I. Hauptgruppe (Spalte).', ok: true, fb: 'Richtig: Perioden zählt man waagrecht, Hauptgruppen senkrecht.' },
+  { t: 'In der I. Periode (Zeile) und in der 4. Hauptgruppe (Spalte).', fb: 'Vertauscht: Perioden sind die Zeilen, Hauptgruppen die Spalten.' },
+  { t: 'In der 4. Periode (Zeile) und in der VIII. Hauptgruppe (Spalte).', fb: 'Die VIII. Hauptgruppe ist die letzte Spalte. Tippe auf K und lies nach.' }], onOk: function(){ S.ok.pos = true; } });
+mc($('tGas'), { q: 'd) Wähle <b>alle</b> Elemente, die bei Raumtemperatur gasförmig sind.', multi: true, opts: [
+  { t: 'Stickstoff', ok: true }, { t: 'Sauerstoff', ok: true }, { t: 'Neon', ok: true },
+  { t: 'Kohlenstoff', fb: 'Kohlenstoff ist fest (schwarz im Feld).' }, { t: 'Lithium', fb: 'Lithium ist ein festes Metall.' }],
+  okFb: 'Richtig: Stickstoff, Sauerstoff und Neon sind Gase (rote Symbole).', onOk: function(){ S.ok.gas = true; } });
+mc($('tSym'), { q: 'e) Was bedeutet der Unterschied zwischen „Mg (s)“ und „Mg“ (ohne Zusatz)?', opts: [
+  { t: 'Mg (s) steht für den festen Stoff Magnesium, Mg auch für ein Atom.', ok: true, fb: 'Richtig: (s) bezieht sich auf den Stoff. Das Symbol Mg bezeichnet auch ein Atom des Elements.' },
+  { t: 'Mg (s) steht für ein einzelnes Atom Magnesium, Mg für den festen Stoff.', fb: 'Umgekehrt: Der Zusatz (s) beschreibt den Aggregatzustand eines Stoffes.' },
+  { t: 'Mg (s) steht für Magnesium in Lösung, Mg für ein einzelnes Atom davon.', fb: '(s) bedeutet fest (solid), nicht gelöst.' }], onOk: function(){ S.ok.sym = true; } });
+buildHE('he4', 'Hefteintrag 4', [
+  { h2: '4 Das Periodensystem der Elemente (PSE)' },
+  { h3: '4.1 Aufbau' },
+  { p: 'Das PSE ordnet die [[Elemente*;Verbindungen;Stoffgemische]]. Die waagrechten Zeilen heißen [[Perioden*;Hauptgruppen]], die senkrechten Spalten [[Hauptgruppen*;Perioden]]. Es gibt [[7*;5;10]] Perioden und [[8*;7;18]] Hauptgruppen.' },
+  { h3: '4.2 Einteilung der Elemente' },
+  { p: 'Die meisten Elemente sind [[Metalle*;Nichtmetalle]]. Sie stehen im PSE links und unten. Die [[Nichtmetalle*;Metalle]] stehen rechts oben, dazwischen liegen die [[Halbmetalle*;Edelgase]]. Wasserstoff steht links oben, ist aber ein [[Nichtmetall*;Metall;Halbmetall]].' },
+  { h3: '4.3 Symbole' },
+  { p: 'Jedes Element hat ein [[Symbol*;Formel]] aus ein oder zwei Buchstaben, oft nach dem [[lateinischen*;englischen]] Namen (C: Carboneum, S: Sulfur).' },
+  { p: 'Mg (s) steht für den [[Stoff*;Atom]] Magnesium (fest), das Symbol Mg allein auch für ein [[Atom*;Stoff]] des Elements.' }
+], 'he4');
+
+/* ---------- 2 Waage-Werkstatt ---------- */
+var EXP = [
+  { k: 'holzO', t: 'Holz, offen', mat: 'holz', closed: false, a: '5,20', b: '4,85', rel: 'k' },
+  { k: 'eisenO', t: 'Eisenwolle, offen', mat: 'eisen', closed: false, a: '3,00', b: '3,35', rel: 'g' },
+  { k: 'holzZ', t: 'Holz, geschlossen', mat: 'holz', closed: true, a: '148,60', b: '148,60', rel: 'e' },
+  { k: 'eisenZ', t: 'Eisenwolle, geschlossen', mat: 'eisen', closed: true, a: '151,20', b: '151,20', rel: 'e' }
+];
+var cur = EXP[0], phase = 0;
+function scaleSVG(e, ph) {
+  var after = ph === 1, run = ph === 'run', val = after ? e.b : e.a, g = '';
+  g += '<rect x="1" y="1" width="358" height="238" rx="12" fill="#fff" stroke="#c9d6e4"/>';
+  g += '<rect x="60" y="176" width="240" height="46" rx="8" fill="#cbd5e1" stroke="#94a3b8"/><rect x="110" y="186" width="140" height="26" rx="4" fill="#0f172a"/>' +
+    '<text x="180" y="205" text-anchor="middle" font-family="monospace" font-size="18" fill="#4ade80">' + (run ? '…' : val + ' g') + '</text><rect x="90" y="165" width="180" height="10" rx="3" fill="#94a3b8"/>';
+  var mx = 180, base = 165;
+  if (!e.closed) {
+    g += '<path d="M140 ' + (base - 14) + ' H220 L212 ' + base + ' H148 Z" fill="#e2e8f0" stroke="#64748b" stroke-width="2"/>';
+    base = base - 14;
+  } else {
+    g += '<rect x="130" y="95" width="100" height="70" rx="14" fill="#eaf4fb" fill-opacity=".7" stroke="#44617f" stroke-width="3"/><rect x="168" y="62" width="24" height="36" fill="#eaf4fb" fill-opacity=".7" stroke="#44617f" stroke-width="3"/><rect x="162" y="52" width="36" height="12" rx="3" fill="#7c5a3a"/>';
+    base = base - 4;
+  }
+  if (e.mat === 'holz') {
+    if (!after) g += '<rect x="154" y="' + (base - 18) + '" width="52" height="18" rx="3" fill="#a16b3a" stroke="#6b4423"/><path d="M158 ' + (base - 12) + ' H202 M158 ' + (base - 6) + ' H202" stroke="#6b4423" stroke-width="1"/>';
+    else g += '<path d="M156 ' + base + ' q6 -12 14 -6 q8 -10 16 -2 q10 -8 18 8 Z" fill="#1f2937"/>';
+  } else {
+    if (!after) g += '<path d="M152 ' + (base - 2) + ' q6 -22 14 -4 q6 -24 14 -2 q8 -22 14 0 q8 -18 14 6" fill="none" stroke="#9aa5b1" stroke-width="5" stroke-linecap="round"/>';
+    else g += '<path d="M152 ' + (base - 2) + ' q6 -22 14 -4 q6 -24 14 -2 q8 -22 14 0 q8 -18 14 6" fill="none" stroke="#4b3a2f" stroke-width="6" stroke-linecap="round"/>';
+  }
+  if (run) g += '<ellipse cx="180" cy="' + (base - 24) + '" rx="' + (e.mat === 'holz' ? 20 : 12) + '" ry="' + (e.mat === 'holz' ? 28 : 16) + '" fill="#fb923c" fill-opacity=".85"/><ellipse cx="180" cy="' + (base - 18) + '" rx="9" ry="16" fill="#fde047"/>';
+  g += '<text x="180" y="20" text-anchor="middle" font-family="Segoe UI,Arial" font-size="15" font-weight="700" fill="#12304f">' + e.t + '</text>';
+  g += '<text x="180" y="40" text-anchor="middle" font-family="Segoe UI,Arial" font-size="13" fill="#5b6b7c">' + (e.closed ? 'Kolben dicht verschlossen' : 'Gefäß oben offen') + ' · ' + (run ? 'Reaktion läuft' : after ? 'nachher' : 'vorher') + '</text>';
+  return '<svg viewBox="0 0 360 240" class="wsvg" role="img" aria-label="Waage mit Versuch">' + g + '</svg>';
+}
+function drawExp() { $('scaleWrap').innerHTML = scaleSVG(cur, phase); $('runBtn').disabled = phase !== 0; $$('#expBtns button').forEach(function(b){ b.classList.toggle('sel', b.dataset.k === cur.k); }); }
+function expTable() {
+  var h = '<tr><th>Versuch</th><th>vorher</th><th>nachher</th><th>Die Masse nachher ist …</th></tr>';
+  EXP.forEach(function(e){ var d = S.exp[e.k];
+    h += '<tr><td>' + e.t + '</td><td>' + (d ? e.a + ' g' : '–') + '</td><td>' + (d ? e.b + ' g' : '–') + '</td><td>' + (d ? '<select class="es" data-k="' + e.k + '" data-r="' + e.rel + '"><option value="">wähle</option><option value="k"' + (S.expSel[e.k] === 'k' ? ' selected' : '') + '>kleiner</option><option value="e"' + (S.expSel[e.k] === 'e' ? ' selected' : '') + '>gleich</option><option value="g"' + (S.expSel[e.k] === 'g' ? ' selected' : '') + '>größer</option></select>' : '–') + '</td></tr>'; });
+  $('expTab').innerHTML = h;
+  $$('.es').forEach(function(s){ s.addEventListener('change', function(){ S.expSel[s.dataset.k] = s.value; s.style.borderColor = s.value === s.dataset.r ? '#15803d' : '#b91c1c';
+    var all = EXP.every(function(e){ return S.expSel[e.k] === e.rel; }); S.ok.exp = all;
+    $('expFb').className = 'fb ' + (s.value === s.dataset.r ? 'good' : 'bad');
+    $('expFb').textContent = all ? '✓ Alle vier Vergleiche stimmen. Offen ändert sich die Masse, geschlossen nicht.' : (s.value === s.dataset.r ? '✓ Richtig.' : '✗ Vergleiche die Zahlen in „vorher“ und „nachher“.'); refresh(); }); });
+  $$('.es').forEach(function(s){ if (S.expSel[s.dataset.k]) s.style.borderColor = S.expSel[s.dataset.k] === s.dataset.r ? '#15803d' : '#b91c1c'; });
+}
+(function(){
+  $('expBtns').innerHTML = EXP.map(function(e){ return '<button data-k="' + e.k + '">' + e.t + '</button>'; }).join('');
+  $$('#expBtns button').forEach(function(b){ b.addEventListener('click', function(){ cur = EXP.filter(function(e){ return e.k === b.dataset.k; })[0]; phase = S.exp[cur.k] ? 1 : 0; drawExp(); $('expMsg').textContent = ''; }); });
+  $('runBtn').addEventListener('click', function(){ phase = 'run'; drawExp(); $('runBtn').disabled = true; $('expMsg').textContent = 'Reaktion läuft …';
+    setTimeout(function(){ phase = 1; S.exp[cur.k] = true; drawExp(); $('expMsg').textContent = '✓ Messwerte stehen in der Tabelle.'; expTable(); refresh(); }, 1400); });
+  $('resetBtn').addEventListener('click', function(){ phase = S.exp[cur.k] ? 1 : 0; phase = 0; drawExp(); $('expMsg').textContent = 'Zurückgesetzt. Du kannst den Versuch noch einmal ansehen.'; $('runBtn').disabled = false; });
+  drawExp(); expTable();
+})();
+mc($('eHolz'), { q: 'a) Holz brennt im <b>offenen</b> Gefäß, und die Masse nimmt ab. Warum?', opts: [
+  { t: 'Es entstehen Gase wie Kohlenstoffdioxid, die in die Luft entweichen.', ok: true, fb: 'Richtig: Die Produkte sind teilweise gasförmig und verlassen das offene System. Die Masse ist nicht verschwunden, sie steckt in den Gasen.' },
+  { t: 'Beim Verbrennen werden Atome zerstört, und die Masse geht verloren.', fb: 'Nach Dalton werden Atome nicht zerstört. Wohin könnten die Atome gegangen sein?' },
+  { t: 'Die Waage zeigt bei hohen Temperaturen etwas weniger an als sonst.', fb: 'Die Temperatur der Waage ist nicht die Ursache. Denke an die Reaktionsprodukte.' }], onOk: function(){ S.ok.eHolz = true; } });
+mc($('eEisen'), { q: 'b) Eisenwolle glüht im <b>offenen</b> Gefäß, und die Masse nimmt zu. Warum?', opts: [
+  { t: 'Das Eisen verbindet sich mit Sauerstoff, der aus der Luft stammt.', ok: true, fb: 'Richtig: Der Sauerstoff aus der Luft wird Teil des Feststoffs (Eisenoxid). Die Masse kommt aus der Luft.' },
+  { t: 'Das Eisen nimmt beim Erhitzen Wärme auf, und diese wird mitgewogen.', fb: 'Wärme wird hier nicht als Masse gewogen. Welcher Stoff aus der Luft reagiert mit Eisen?' },
+  { t: 'Beim Glühen entstehen aus dem Eisen zusätzliche neue Eisen-Atome.', fb: 'Atome werden nicht neu erzeugt. Woher kommt zusätzliche Masse?' }], onOk: function(){ S.ok.eEisen = true; } });
+mc($('eZu'), { q: 'c) Im <b>geschlossenen</b> Kolben bleibt die Masse bei beiden Versuchen gleich. Warum?', opts: [
+  { t: 'Es kann kein Stoff ein- oder austreten, daher bleibt die Gesamtmasse erhalten.', ok: true, fb: 'Richtig: Wie viel Gas auch entsteht oder gebunden wird, es bleibt im System.' },
+  { t: 'Im Kolben läuft keine chemische Reaktion ab, deshalb ändert sich nichts.', fb: 'Die Reaktion läuft ab (Glühen, Verbrennen). Nur die Gesamtmasse ändert sich nicht.' },
+  { t: 'Die Waage kann das Gewicht von Gasen nicht messen und zeigt es nicht an.', fb: 'Gase haben Masse. Sie wird mitgewogen, wenn sie im Kolben bleiben.' }], onOk: function(){ S.ok.eZu = true; } });
+
+/* ---------- 3 Erklärung ---------- */
+var e3 = false;
+function enterStep3() {
+  if (e3) return; e3 = true;
+  var ITEMS = [
+    { n: 'Lagerfeuer im Freien', c: 'o', h: 'Beim Lagerfeuer entweichen die Verbrennungsgase in die Luft und Sauerstoff strömt nach: offen.' },
+    { n: 'Kerze auf einem Teller', c: 'o', h: 'Die Kerze brennt an der Luft, Gase können entweichen: offen.' },
+    { n: 'Eisen rostet draußen am Zaun', c: 'o', h: 'Sauerstoff aus der Luft kann jederzeit dazukommen: offen.' },
+    { n: 'zugeschraubte Flasche mit Brausetablette', c: 'g', h: 'Die Flasche ist dicht, es tritt kein Stoff aus: geschlossen.' },
+    { n: 'zugeschmolzene Glasampulle mit Eisenwolle', c: 'g', h: 'Die Ampulle ist dicht verschlossen: geschlossen.' },
+    { n: 'dicht verschlossener Kolben mit brennendem Holz', c: 'g', h: 'Kein Stoff kann ein- oder austreten: geschlossen.' }];
+  var CATS = [['o', 'offenes System'], ['g', 'geschlossenes System']], sel = null, placed = 0, chips = $('chips'), bins = $('bins');
+  shuffle(ITEMS).forEach(function(it){ var c = document.createElement('div'); c.className = 'chip'; c.textContent = it.n;
+    c.addEventListener('click', function(){ if (c.classList.contains('good')) return; $$('.chip.sel').forEach(function(x){ x.classList.remove('sel'); }); c.classList.add('sel'); sel = it; $$('.bin').forEach(function(b){ b.classList.add('hot'); }); }); chips.appendChild(c); });
+  CATS.forEach(function(k){ var b = document.createElement('div'); b.className = 'bin'; b.innerHTML = '<h4>' + k[1] + '</h4><div class="chips"></div>';
+    b.addEventListener('click', function(){ if (!sel) return; var chip = $$('.chip.sel')[0];
+      if (sel.c === k[0]) { chip.classList.remove('sel'); chip.classList.add('good'); b.querySelector('.chips').appendChild(chip); $('sortFb').className = 'fb good'; $('sortFb').textContent = '✓ ' + sel.h; sel = null; placed++; $$('.bin').forEach(function(x){ x.classList.remove('hot'); });
+        if (placed === ITEMS.length) { S.ok.sort = true; $('sortFb').textContent += ' Alle richtig zugeordnet!'; refresh(); } }
+      else { chip.classList.add('shake'); setTimeout(function(){ chip.classList.remove('shake'); }, 400); $('sortFb').className = 'fb bad'; $('sortFb').textContent = '✗ Das passt nicht. Tipp: Können Gase oder andere Stoffe in das Gefäß hinein oder heraus?'; } });
+    bins.appendChild(b); });
+  mc($('tSatz'), { q: 'Welche Aussage beschreibt den Satz von der Erhaltung der Masse richtig?', opts: [
+    { t: 'Im geschlossenen System ist die Masse der Produkte gleich der Masse der Edukte.', ok: true, fb: 'Richtig. In offenen Systemen kann Stoff ein- oder austreten, dann sieht es nach einer Massenänderung aus.' },
+    { t: 'Im geschlossenen System ist die Masse der Produkte größer als die der Edukte.', fb: 'Dann müsste Masse neu entstehen. Das passiert bei chemischen Reaktionen nicht.' },
+    { t: 'Im geschlossenen System ist die Masse der Produkte kleiner als die der Edukte.', fb: 'Dann müsste Masse verschwinden. Das passiert bei chemischen Reaktionen nicht.' }], onOk: function(){ S.ok.satz = true; } });
+  wLoad();
+  /* Teilchenbild */
+  var kinds = shuffle(['ok', 'extra', 'less', 'none']), letters = ['A', 'B', 'C', 'D'], imgs = '', opts = [];
+  kinds.forEach(function(k, i){ imgs += '<div>' + DRAW.eqC(k, 'Bild ' + letters[i]) + '</div>'; opts.push({ t: 'Bild ' + letters[i] + ' zeigt die Reaktion richtig.', ok: k === 'ok', fb: k === 'extra' ? 'Hier ist ein Sauerstoff-Teilchen übrig, obwohl vorher alle verbraucht wurden. Zähle nach.' : (k === 'less' ? 'Hier fehlen Atome. Zähle Kohlenstoff- und Sauerstoff-Atome vorher und nachher.' : 'Hier hat keine Reaktion stattgefunden: Es sind weiter Kohlenstoff und Sauerstoff zu sehen.') }); });
+  mc($('tEq'), { q: 'Links siehst du 3 Kohlenstoff-Atome und 3 Sauerstoff-Teilchen (O₂). Welches Bild zeigt die Reaktion zu Kohlenstoffdioxid (CO₂) richtig?', img: imgs, opts: opts.sort(function(x, y){ return x.t < y.t ? -1 : 1; }), okFb: 'Richtig.', onOk: function(){ S.ok.eq = true; } });
+  buildHE('he5', 'Hefteintrag 5', [
+    { h2: '5 Erhaltung der Masse' },
+    { h3: '5.1 Offene und geschlossene Systeme' },
+    { p: 'In einem [[offenen*;geschlossenen]] System können Stoffe (z. B. Gase) mit der Umgebung ausgetauscht werden. In einem [[geschlossenen*;offenen]] System tritt kein Stoff ein oder aus.' },
+    { table: 1 },
+    { p: 'Holz verbrennt im offenen System: Die Masse wird [[kleiner*;größer;gleich]], weil Gase entweichen. Eisenwolle glüht im offenen System: Die Masse wird [[größer*;kleiner;gleich]], weil Sauerstoff aus der Luft gebunden wird.' },
+    { h3: '5.2 Satz von der Erhaltung der Masse (Lavoisier)' },
+    { p: 'Bei einer chemischen Reaktion im [[geschlossenen*;offenen]] System ist die Gesamtmasse der Edukte [[gleich*;kleiner;größer]] der Gesamtmasse der Produkte.' },
+    { h3: '5.3 Erklärung mit dem Atommodell' },
+    { p: 'Bei einer chemischen Reaktion werden Atome nur [[umgruppiert*;zerstört]]. Ihre Anzahl und ihre [[Masse*;Farbe]] bleiben gleich. Deshalb bleibt die Gesamtmasse erhalten.' },
+    { p: 'Beispiel: 12 g Kohlenstoff + 32 g Sauerstoff → [[44*;20;32]] g Kohlenstoffdioxid.' }
+  ], 'he5');
+  fillTab();
+}
+function fillTab() {
+  var h = '<table class="t"><tr><th>Versuch</th><th>vorher</th><th>nachher</th></tr>' + EXP.map(function(e){ return '<tr><td>' + e.t + '</td><td>' + e.a + ' g</td><td>' + e.b + ' g</td></tr>'; }).join('') + '</table>';
+  $$('.hetab').forEach(function(x){ x.innerHTML = h; });
+}
+$('numBtn').addEventListener('click', function(){
+  var v = parseFloat($('numIn').value.replace(',', '.')), fb = $('numFb');
+  if (v === 44) { fb.className = 'fb good'; fb.textContent = '✓ 12 g + 32 g = 44 g. Die Gesamtmasse bleibt erhalten.'; S.ok.num = true; $('numIn').disabled = true; $('numBtn').disabled = true; refresh(); }
+  else { fb.className = 'fb bad'; fb.textContent = '✗ Nicht ganz. Die Gesamtmasse der Produkte entspricht der Gesamtmasse der Ausgangsstoffe.'; }
+});
+/* Atom-Werkstatt (C und O) */
+var W = { cfg: { task: 'Aktivkohle verbrennt: Links siehst du 3 Kohlenstoff-Atome und 3 Sauerstoff-Teilchen. Baue rechts die entstehenden Teilchen so, dass <b>kein Atom verschwindet und keins dazukommt</b>.',
+  left: ['C1', 'C1', 'C1', 'O2', 'O2', 'O2'], opts: [['CO2', 'Kohlenstoffdioxid-Teilchen (1 C-Atom, 2 O-Atome)']] }, counts: {}, animated: false };
+function atomCount(names) { var c = { C: 0, O: 0 }; names.forEach(function(n){ DRAW.MOLS[n].forEach(function(a){ c[a[0]]++; }); }); return c; }
+function rightList() { var l = []; W.cfg.opts.forEach(function(o){ for (var i = 0; i < (W.counts[o[0]] || 0); i++) l.push(o[0]); }); return l; }
+function posOf(names, x0, y0) { return names.map(function(n, i){ return { n: n, x: x0 + (i % 3) * 105, y: y0 + Math.floor(i / 3) * 75 }; }); }
+function drawW() {
+  var svg = $('wsvg'), lp = posOf(W.cfg.left, 70, 90), rl = rightList(), rp = posOf(rl, 480, 90);
+  var h = '<rect x="6" y="6" width="340" height="288" rx="10" fill="#fafcff" stroke="#9fb3c8" stroke-width="2"/><rect x="434" y="6" width="340" height="288" rx="10" fill="#fafcff" stroke="#9fb3c8" stroke-width="2"/>' +
+    '<text x="176" y="30" text-anchor="middle" font-size="16" font-weight="700" fill="#12304f">vorher</text><text x="604" y="30" text-anchor="middle" font-size="16" font-weight="700" fill="#12304f">nachher</text><text x="390" y="160" text-anchor="middle" font-size="34" fill="#12304f">→</text>';
+  h += '<g id="gL">' + lp.map(function(p){ return DRAW.mol(p.n, p.x, p.y); }).join('') + '</g><g id="gR" opacity="1">' + rp.map(function(p){ return DRAW.mol(p.n, p.x, p.y); }).join('') + '</g><g id="gF"></g>';
+  svg.innerHTML = h; W.animated = false;
+}
+function wCtl() {
+  var el = $('wkCtl'); el.innerHTML = '';
+  W.cfg.opts.forEach(function(o){ var d = document.createElement('div'); d.className = 'ctl'; d.innerHTML = '<button data-d="-1">−</button><b>' + (W.counts[o[0]] || 0) + '</b><button data-d="1">+</button><span>' + o[1] + '</span>';
+    $$('button', d).forEach(function(b){ b.addEventListener('click', function(){ var v = (W.counts[o[0]] || 0) + (+b.dataset.d); if (v < 0 || v > 6) return; W.counts[o[0]] = v; wUpdate(); }); }); el.appendChild(d); });
+}
+function wUpdate() {
+  wCtl(); drawW();
+  var l = atomCount(W.cfg.left), r = atomCount(rightList());
+  $('wkCount').innerHTML = '<tr><th></th><th>Kohlenstoff-Atome</th><th>Sauerstoff-Atome</th></tr><tr><td>vorher</td><td>' + l.C + '</td><td>' + l.O + '</td></tr><tr><td>nachher</td><td>' + r.C + '</td><td>' + r.O + '</td></tr>';
+  var ok = l.C === r.C && l.O === r.O && rightList().length > 0, fb = $('wkFb');
+  if (!rightList().length) { fb.className = 'fb'; fb.textContent = ''; }
+  else if (ok) { fb.className = 'fb good'; fb.textContent = '✓ Die Atome stimmen überein. Klicke auf „Umgruppierung zeigen“.'; }
+  else { var m = []; if (r.C !== l.C) m.push('Kohlenstoff-Atome: vorher ' + l.C + ', nachher ' + r.C); if (r.O !== l.O) m.push('Sauerstoff-Atome: vorher ' + l.O + ', nachher ' + r.O); fb.className = 'fb bad'; fb.textContent = '✗ Atome werden weder erzeugt noch zerstört. ' + m.join('; ') + '.'; }
+  $('wkRun').disabled = !ok; W.ok = ok;
+}
+function wLoad() { W.counts = {}; $('wkTask').innerHTML = W.cfg.task; wUpdate(); $('wkPng').disabled = true; }
+$('wkRun').addEventListener('click', function(){
+  var gL = $('gL'), gR = $('gR'), gF = $('gF'), left = $$('circle', gL), right = $$('circle', gR);
+  gR.setAttribute('opacity', '0.18'); gL.setAttribute('opacity', '0.18'); gF.innerHTML = '';
+  var avail = right.slice(), fl = [];
+  left.forEach(function(c){ var t = c.dataset.t, ti = avail.findIndex(function(x){ return x.dataset.t === t; }); if (ti < 0) return; var tg = avail.splice(ti, 1)[0];
+    var f = c.cloneNode(true); f.style.transition = 'transform 1.8s ease-in-out'; gF.appendChild(f); fl.push([f, tg, c]); });
+  requestAnimationFrame(function(){ requestAnimationFrame(function(){ fl.forEach(function(p){ var dx = +p[1].getAttribute('cx') - +p[2].getAttribute('cx'), dy = +p[1].getAttribute('cy') - +p[2].getAttribute('cy'); p[0].style.transform = 'translate(' + dx + 'px,' + dy + 'px)'; }); }); });
+  $('wkRun').disabled = true;
+  setTimeout(function(){ $('wkPng').disabled = false; W.animated = true; S.ok.werk = true; $('wkFb').className = 'fb good'; $('wkFb').textContent = '✓ Die Atome wurden nur umgruppiert. Es sind genau so viele Atome wie vorher, deshalb ist auch die Gesamtmasse gleich.'; $('wkRun').disabled = false; refresh(); }, 2000);
+});
+$('wkPng').addEventListener('click', function(){
+  var svg = $('wsvg').cloneNode(true); svg.setAttribute('xmlns', 'http://www.w3.org/2000/svg'); svg.setAttribute('width', 1560); svg.setAttribute('height', 600); svg.removeAttribute('class');
+  $$('#gF circle', svg).forEach(function(c){ c.style.transition = 'none'; });
+  var xml = new XMLSerializer().serializeToString(svg), img = new Image();
+  img.onload = function(){ var cv = document.createElement('canvas'); cv.width = 1560; cv.height = 600; var cx = cv.getContext('2d'); cx.fillStyle = '#fff'; cx.fillRect(0, 0, 1560, 600); cx.drawImage(img, 0, 0, 1560, 600);
+    cv.toBlob(function(b){ var a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = 'Atom-Werkstatt-Kohlenstoff.png'; a.click(); }); };
+  img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(xml);
+});
+
+/* ---------- 4 Abschluss ---------- */
+(function(){
+  var AREAS = [['p', 'Das Periodensystem lesen (Perioden, Hauptgruppen) und Elemente einteilen', 'Gehe zu Schritt 1 zurück und suche Elemente im PSE. Achte auf Zeile (Periode) und Spalte (Hauptgruppe).'],
+    ['m', 'Offene und geschlossene Systeme unterscheiden, Massenänderungen erklären', 'Gehe zu Schritt 2 zurück und starte die Versuche noch einmal. Frage dich: Was kann das Gefäß verlassen, was kann hinein?'],
+    ['d', 'Den Satz von der Erhaltung der Masse mit Atomen begründen', 'Gehe zu Schritt 3 zurück und baue die Atom-Werkstatt noch einmal. Zähle die Atome vorher und nachher.']];
+  var h = '';
+  AREAS.forEach(function(a){ h += '<div class="task"><div class="q">' + a[1] + '</div><div class="ampel" data-k="' + a[0] + '"><button class="g">🟢 sicher</button><button class="y">🟡 teilweise</button><button class="r">🔴 unsicher</button></div><div class="hint fbA"></div></div>'; });
+  $('ampel').innerHTML = h;
+  $$('.ampel').forEach(function(box, i){ $$('button', box).forEach(function(b){ b.addEventListener('click', function(){
+    $$('button', box).forEach(function(x){ x.classList.remove('sel'); }); b.classList.add('sel'); S.ampel[box.dataset.k] = b.className.split(' ')[0];
+    box.parentNode.querySelector('.fbA').textContent = b.classList.contains('r') ? '→ ' + AREAS[i][2] : (b.classList.contains('y') ? '→ Tipp: ' + AREAS[i][2] : '✓ Sehr gut.'); }); }); });
+  if (MEBIS_TEST_URL) { $('testLink').href = MEBIS_TEST_URL; } else { $('testLink').removeAttribute('href'); $('testHint').textContent = 'Öffne im mebis-Kurs den Selbstcheck-Test „PSE und Masseerhalt“.'; }
+  $('copyAll').addEventListener('click', function(){ var ids = ['he4', 'he5'].filter(function(i){ return HE[i]; }); if (!ids.length) { $('copyAllMsg').textContent = 'Noch keine Hefteinträge vorhanden.'; return; } copyHE(ids, $('copyAllMsg')); });
+})();
+go(0);
+window.__S = S; window.__go = go;
+
+})();
+</script>
+</body>
+</html>
